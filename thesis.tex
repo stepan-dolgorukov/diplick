@@ -1,0 +1,397 @@
+% !TEX program = xelatex
+% Заготовка ВКР по требованиям ИЕНиМ (2024) и ГОСТ 7.32–2017.
+% Запуск: latexmk -xelatex -interaction=nonstopmode thesis.tex
+\documentclass[a4paper,14pt]{extarticle}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\newfontfamily\cyrillicfont{Times New Roman}[Script=Cyrillic]
+\newfontfamily\cyrillicfontsf{Times New Roman}[Script=Cyrillic]
+\newfontfamily\cyrillicfonttt{Liberation Mono}
+
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{3em}
+\tolerance=2000
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% Заголовки: структурные элементы — по центру, разделы — с абзаца.
+% Переносы в заголовках запрещены (ИЕНиМ, с. 13; УрФУ, с. 40).
+\titleformat{\section}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesection}{0.5em}{}
+\titlespacing*{\section}{1.25cm}{1.5\baselineskip}{1\baselineskip}
+\titleformat{\subsection}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{1.25cm}{1\baselineskip}{0.5\baselineskip}
+\titleformat{\subsubsection}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\subsubsection}{1.25cm}{0.75\baselineskip}{0.25\baselineskip}
+
+% Структурный заголовок: прописными, полужирным, по центру строки.
+% Отступ 1,25 см здесь не применяется — только к разделам и подразделам.
+\makeatletter
+\newcommand{\structheading}[1]{%
+  \phantomsection
+  \begingroup
+    \centering
+    \parindent=0pt
+    \hyphenpenalty=10000\exhyphenpenalty=10000
+    \textbf{#1}\par
+  \endgroup
+  \vspace{0.5\baselineskip}}
+\newcommand{\structtitle}[1]{%
+  \clearpage
+  \structheading{#1}%
+  \addcontentsline{toc}{section}{#1}}
+\newcommand{\fronttitle}[1]{%
+  \clearpage
+  \structheading{#1}}
+\newcommand{\vkrtableofcontents}{\@starttoc{toc}}
+% Отточие после каждого элемента содержания (ИЕНиМ, с. 10; УрФУ, с. 24).
+\renewcommand{\l@section}{\@dottedtocline{1}{0pt}{1.5em}}
+\makeatother
+
+% Подписи: 12 pt, разделитель — тире (ИЕНиМ, с. 14–16; УрФУ, с. 49).
+% Подпись рисунка: одна строка — по центру, несколько — по ширине.
+% Название таблицы: слева, без абзацного отступа.
+\DeclareCaptionFont{vkrcaption}{\small}
+\captionsetup{font=vkrcaption,labelsep=endash,justification=justified,singlelinecheck=true}
+\captionsetup[table]{justification=raggedright,singlelinecheck=false,indention=0pt}
+
+\pagestyle{plain}
+\makeatletter
+\renewcommand{\@oddfoot}{\hfil\thepage\hfil}
+\renewcommand{\@evenfoot}{\hfil\thepage\hfil}
+\makeatother
+
+% Нумерация рисунков, таблиц и формул — по разделу: Рисунок 2.1, Таблица 3.1, (4.1).
+% ИЕНиМ, с. 14–16. Для приложения А:
+% \renewcommand{\thefigure}{А.\arabic{figure}}\setcounter{figure}{0}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{equation}{section}
+
+% ИЕНиМ, с. 16: выше и ниже выключной формулы — не менее одной свободной строки.
+\AtBeginDocument{%
+  \setlength{\abovedisplayskip}{\baselineskip}%
+  \setlength{\belowdisplayskip}{\baselineskip}%
+  \setlength{\abovedisplayshortskip}{\baselineskip}%
+  \setlength{\belowdisplayshortskip}{\baselineskip}}
+
+% Список источников: арабские цифры без точки, с абзацного отступа (ИЕНиМ, с. 18).
+\newcounter{source}
+\newenvironment{sourcelist}{%
+  \begin{list}{\arabic{source}}{%
+    \usecounter{source}%
+    \setlength{\leftmargin}{\dimexpr\parindent+1.2em\relax}%
+    \setlength{\labelwidth}{0.7em}%
+    \setlength{\labelsep}{0.5em}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parsep}{0pt}%
+    \setlength{\topsep}{0pt}%
+    \setlength{\partopsep}{0pt}}%
+}{\end{list}}
+
+% Строки реферата: подчёркивание не выходит за правое поле.
+\newlength{\refw}
+\newcommand{\refblankline}[1]{%
+  \par
+  \noindent\hspace*{\parindent}%
+  \settowidth{\refw}{#1}%
+  #1\underline{\hspace{\dimexpr\linewidth-\parindent-\refw-0.5em\relax}}\par}
+\newcommand{\refkeywords}[1]{%
+  \par
+  \noindent
+  \settowidth{\refw}{#1}%
+  #1\ \underline{\hspace{\dimexpr\linewidth-\refw-0.5em\relax}}\par}
+
+% —————————————————————————
+% Данные работы (замените значения перед началом набора текста)
+% Эти макросы выводятся и на титульном листе, и в задании, и в реферате.
+% —————————————————————————
+\newcommand{\VKRTitle}{ХРОМАТОГРАФИЧЕСКОЕ ИССЛЕДОВАНИЕ СИСТЕМЫ ПОЛИЭТИЛЕНОКСИД–ХИТОЗАН}
+\newcommand{\VKRStudent}{Смирнов Юрий Викторович}
+\newcommand{\VKRStudentGenitive}{Смирнова Юрия Викторовича}
+% Для титула Ф. И. О. разбивается на две строки, как в образце ИЕНиМ (с. 24).
+\newcommand{\VKRStudentGenitiveTitle}{Смирнова\\Юрия Викторовича}
+\newcommand{\VKRGruppa}{\underline{\hspace{2.5cm}}}
+\newcommand{\VKRDirection}{04.03.01 «Химия»}
+% Образовательная программа указывается при наличии нескольких программ
+% направления подготовки (ИЕНиМ, с. 24, сноска 11).
+\newcommand{\VKRProgram}{«Химия»}
+\newcommand{\VKRInstitute}{Институт естественных наук и математики}
+\newcommand{\VKRInstituteLoc}{Институте естественных наук и математики}
+\newcommand{\VKRDepartment}{Кафедра органической химии и высокомолекулярных соединений}
+\newcommand{\VKRDepartmentLoc}{кафедре органической химии и высокомолекулярных соединений}
+\newcommand{\VKRHeadPosition}{Зав.~кафедрой}
+\newcommand{\VKRHeadDegree}{д.~х.~н., проф.}
+\newcommand{\VKRHeadName}{В.~Я.~Сосновских}
+\newcommand{\VKRNormControlDegree}{к.~х.~н., доц.}
+\newcommand{\VKRNormControlName}{Л.~В.~Адамова}
+\newcommand{\VKRAdvisorDegree}{к.~х.~н., доц.}
+\newcommand{\VKRAdvisor}{И.~С.~Иванов}
+\newcommand{\VKRWorkType}{Выпускная квалификационная работа бакалавра}
+\newcommand{\VKRYear}{2026}
+\newcommand{\VKRPlace}{Екатеринбург}
+
+\hypersetup{
+  pdftitle={\VKRTitle},
+  pdfauthor={\VKRStudent},
+  pdfsubject={Выпускная квалификационная работа}
+}
+
+\begin{document}
+
+% polyglossia выбирает язык при \begin{document} и перезаписывает названия
+% элементов, поэтому задаём их здесь, после выбора языка.
+\renewcommand{\contentsname}{СОДЕРЖАНИЕ}
+\renewcommand{\refname}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ И ЛИТЕРАТУРЫ}
+\renewcommand{\figurename}{Рисунок}
+\renewcommand{\tablename}{Таблица}
+
+% =============================== ТИТУЛЬНЫЙ ЛИСТ =============================
+% Векторный титульный лист по образцу ИЕНиМ (2024), с. 24–26.
+% Поля и шрифт наследуются от основного документа; титул набирается
+% одинарным интервалом, как в образце (основной текст — 1,5).
+% Грифы СОГЛАСОВАНО/УТВЕРЖДАЮ не печатаются: в образце ИЕНиМ их нет.
+\thispagestyle{empty}
+\begingroup
+\singlespacing
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+
+{\centering
+МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+федеральное государственное автономное образовательное учреждение\\
+высшего образования\\
+УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ\\
+имени первого Президента России Б.~Н.~Ельцина\par}
+
+\vspace{1.5\baselineskip}
+
+{\centering \MakeUppercase{\VKRInstitute}\par}
+
+\vspace{3.5\baselineskip}
+
+{\centering \VKRDepartment\par}
+
+\vspace{2.5\baselineskip}
+
+{\centering \textbf{\VKRTitle}\par}
+
+\vspace{1.5\baselineskip}
+
+{\centering
+Направление подготовки \VKRDirection\\
+Образовательная программа \VKRProgram\par}
+
+\vspace{3\baselineskip}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+\VKRHeadPosition:\\[0.2em]
+\VKRHeadDegree\ \VKRHeadName\\[2.2em]
+\rule{5.5cm}{0.4pt}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\VKRWorkType\\[1em]
+\textbf{\VKRStudentGenitiveTitle}\\[1.2em]
+\rule{5.5cm}{0.4pt}
+\end{minipage}
+
+\vspace{2\baselineskip}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+Нормоконтролер:\\[0.2em]
+\VKRNormControlDegree\ \VKRNormControlName\\[2.2em]
+\rule{4.5cm}{0.4pt}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+Научный руководитель:\\[0.2em]
+\VKRAdvisorDegree\ \VKRAdvisor\\[2.2em]
+\rule{5.5cm}{0.4pt}
+\end{minipage}
+
+\vfill
+
+{\centering
+\VKRPlace\\
+\VKRYear\par}
+\endgroup
+\clearpage
+
+% Титульный лист учитывается в общей нумерации, но цифра на нём не печатается.
+\setcounter{page}{2}
+
+% ================================ ЗАДАНИЕ ===================================
+% Бланк задания для печати и подписания. Подписанный скан можно вставить
+% вместо этой страницы, сохранив номер страницы 2.
+\structheading{ЗАДАНИЕ НА ВЫПОЛНЕНИЕ ВКР}
+
+\begin{flushright}
+УТВЕРЖДАЮ\\[0.2em]
+Руководитель образовательной программы\\[0.5em]
+\underline{\hspace{4cm}}\quad(\underline{\hspace{2.6cm}})\\[0.3em]
+«\underline{\hspace{0.8cm}}» \underline{\hspace{3cm}} 20\underline{\hspace{0.5cm}} г.
+\end{flushright}
+
+\vspace{0.5em}
+\noindent Направление подготовки: \VKRDirection\\
+\noindent Наименование программы: \underline{\hspace{0.55\linewidth}}\\
+\noindent Группа: \VKRGruppa
+
+\begin{center}
+\textbf{ЗАДАНИЕ}\\
+на выполнение выпускной квалификационной работы
+\end{center}
+
+\noindent студента \VKRStudentGenitive\\
+{\footnotesize (фамилия, имя, отчество)}
+
+\noindent Квалификация: бакалавр\\
+{\footnotesize (бакалавр, специалист, магистр)}
+
+{\hyphenpenalty=10000\exhyphenpenalty=10000
+\noindent Провести научное исследование по теме: \VKRTitle\par}
+
+\begin{center}
+Срок представления работы научному руководителю:\\
+«\underline{\hspace{0.8cm}}» \underline{\hspace{1.6cm}} 20\underline{\hspace{0.55cm}} г.
+\end{center}
+
+\noindent Научный руководитель \hfill \underline{\hspace{4.5cm}}\quad(\VKRAdvisor)
+
+\vspace{0.5em}
+\noindent Задание принял к исполнению \hfill \underline{\hspace{3.5cm}}
+
+% =============================== РЕФЕРАТ ====================================
+\fronttitle{РЕФЕРАТ}
+Отчет \underline{\hspace{1.2cm}} с., \underline{\hspace{0.8cm}} рис., \underline{\hspace{0.8cm}} табл., \underline{\hspace{1.2cm}} источн., \underline{\hspace{0.8cm}} прил.
+
+\refkeywords{Ключевые слова:}
+\refblankline{Объект исследования~— }
+\refblankline{Цель работы~— }
+\refblankline{Методы исследования~— }
+\refblankline{Результаты и их новизна~— }
+\refblankline{Область применения~— }
+\refblankline{Значимость работы~— }
+
+\fronttitle{МЕСТО ВЫПОЛНЕНИЯ РАБОТЫ}
+Работа выполнена в \VKRInstituteLoc, на \VKRDepartmentLoc{} Уральского федерального университета, г.~\VKRPlace.
+
+% =============================== СОДЕРЖАНИЕ =================================
+\fronttitle{\contentsname}
+\vkrtableofcontents
+
+% ========================= ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ =========================
+\structtitle{ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ}
+В настоящей работе применяют следующие обозначения и сокращения.
+
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.73\textwidth}@{}}
+ВКР & — выпускная квалификационная работа\\
+Добавьте & — расшифровка сокращения
+\end{tabular}
+
+% ================================ ВВЕДЕНИЕ ==================================
+\structtitle{ВВЕДЕНИЕ}
+Во введении необходимо обосновать актуальность темы, сформулировать объект и предмет исследования, цель и задачи работы, методы исследования, научную новизну, практическую значимость и положения, выносимые на защиту.
+
+% =============================== ОСНОВНАЯ ЧАСТЬ =============================
+\clearpage\section{Обзор литературы}
+Текст подраздела. Ссылки на источники оформляются в квадратных скобках, например [1].
+
+\clearpage\section{Постановка задачи}
+Сформулируйте исследовательскую задачу и критерии оценки результатов.
+
+\clearpage\section{Методика эксперимента}
+\subsection{Материалы и оборудование}
+Опишите объект исследования, материалы, приборы и условия эксперимента.
+\subsection{Методика проведения исследования}
+Опишите последовательность теоретических и экспериментальных процедур.
+
+\clearpage\section{Результаты и их обсуждение}
+\subsection{Результаты}
+Представьте результаты с необходимыми рисунками, таблицами и расчетами.
+
+% Пример оформления рисунка — замените изображение и подпись своим материалом.
+\begin{figure}[htbp]
+  \centering
+  \fbox{\rule{0pt}{3cm}\rule{8cm}{0pt}}
+  \caption{Пример оформления рисунка}
+  \label{fig:example}
+\end{figure}
+
+На рисунке~\ref{fig:example} приведен пример оформления иллюстрации.
+
+% Пример оформления таблицы — замените данные своим материалом.
+\begin{table}[htbp]
+  \caption{Пример оформления таблицы}
+  \label{tab:example}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    Показатель & Значение 1 & Значение 2 \\
+    \midrule
+    Пример & 1,0 & 2,0 \\
+    Пример & 3,0 & 4,0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+В таблице~\ref{tab:example} приведен пример оформления табличных данных.
+
+% Пример оформления формулы — замените своим материалом.
+Уравнение состояния идеального газа имеет вид
+\begin{equation}
+  pV = nRT,
+  \label{eq:state}
+\end{equation}
+где $p$ — давление; $V$ — объем; $n$ — количество вещества; $R$ — универсальная газовая постоянная; $T$ — температура.
+
+Формула~\eqref{eq:state} приведена в качестве примера оформления.
+
+\subsection{Обсуждение результатов}
+Сопоставьте результаты с опубликованными данными и оцените достоверность.
+Дополнительные материалы, необходимые для понимания результатов, приведены в приложении~А.
+
+\structtitle{ЗАКЛЮЧЕНИЕ (ВЫВОДЫ)}
+Сформулируйте краткие выводы по задачам, оцените полноту решения, практическую значимость и возможные направления дальнейшей работы.
+
+\structtitle{\refname}
+\begin{sloppypar}
+\begin{sourcelist}
+  \item Автор. Название источника. – Место издания : Издательство, год. – 100 с.
+  \item Автор статьи. Название статьи // Журнал. – 2024. – Т. 35, № 1. – С. 1–10.
+\end{sourcelist}
+\end{sloppypar}
+
+% =============================== ПРИЛОЖЕНИЕ =================================
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ А}
+\begingroup
+  \centering
+  \parindent=0pt
+  \hyphenpenalty=10000\exhyphenpenalty=10000
+  \textbf{ПРИЛОЖЕНИЕ А}\par
+  (обязательное)\par
+  \textbf{ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ}\par
+\endgroup
+\vspace{0.5\baselineskip}
+
+Материалы приложения, необходимые для понимания результатов исследования. Каждое следующее приложение начинайте с новой страницы.
+
+\end{document}
