@@ -593,7 +593,9 @@ $T$~— температура.
 
 В шаблоне подключён `amsmath`, `\counterwithin{equation}{section}`, а
 `\abovedisplayskip`/`\belowdisplayskip` приравнены к `\baselineskip`, чтобы
-выполнялось требование о свободной строке.
+выполнялось требование о свободной строке. Математический шрифт — Times New
+Roman (через `unicode-math` + `TeX Gyre Termes Math`), гарнитура формул не
+отличается от текстовой.
 
 ---
 
@@ -724,7 +726,7 @@ $T$~— температура.
 ```latex
 \clearpage
 \phantomsection
-\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ А}
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ А (обязательное). ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ}
 \begingroup
   \centering
   \parindent=0pt
