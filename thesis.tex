@@ -3,6 +3,13 @@
 % Запуск: latexmk -xelatex -interaction=nonstopmode thesis.tex
 \documentclass[a4paper,14pt]{extarticle}
 
+% extsizes с опцией 14pt берёт классический \@xivpt, то есть 14,4 pt.
+% Требование — ровно 14 pt (ИЕНиМ, с. 12; УрФУ, с. 15), поэтому
+% переопределяем \normalsize: кегль 14 pt, интерлиньяж 17 pt.
+\makeatletter
+\renewcommand\normalsize{\@setfontsize\normalsize{14}{17}}
+\makeatother
+
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \usepackage{polyglossia}
@@ -127,7 +134,7 @@
 \newcommand{\VKRStudent}{Смирнов Юрий Викторович}
 \newcommand{\VKRStudentGenitive}{Смирнова Юрия Викторовича}
 % Для титула Ф. И. О. разбивается на две строки, как в образце ИЕНиМ (с. 24).
-\newcommand{\VKRStudentGenitiveTitle}{Смирнова\\Юрия Викторовича}
+\newcommand{\VKRStudentGenitiveTitle}{Смирнова Юрия\\Викторовича}
 \newcommand{\VKRGruppa}{\underline{\hspace{2.5cm}}}
 \newcommand{\VKRDirection}{04.03.01 «Химия»}
 % Образовательная программа указывается при наличии нескольких программ
@@ -143,7 +150,9 @@
 \newcommand{\VKRNormControlDegree}{к.~х.~н., доц.}
 \newcommand{\VKRNormControlName}{Л.~В.~Адамова}
 \newcommand{\VKRAdvisorDegree}{к.~х.~н., доц.}
-\newcommand{\VKRAdvisor}{И.~С.~Иванов}
+\newcommand{\VKRAdvisorInitials}{И.~С.}
+\newcommand{\VKRAdvisorSurname}{Иванов}
+\newcommand{\VKRAdvisor}{\VKRAdvisorInitials\ \VKRAdvisorSurname}
 \newcommand{\VKRSorukovoditelDegree}{к.~х.~н., доц.}
 \newcommand{\VKRSorukovoditelName}{И.~С.~Иванов}
 \newcommand{\VKRWorkType}{Выпускная квалификационная работа бакалавра}
@@ -167,79 +176,99 @@
 
 % =============================== ТИТУЛЬНЫЙ ЛИСТ =============================
 % Векторный титульный лист по образцу ИЕНиМ (2024), с. 24–26.
-% Поля и шрифт наследуются от основного документа; титул набирается
-% одинарным интервалом, как в образце (основной текст — 1,5).
-% Грифы СОГЛАСОВАНО/УТВЕРЖДАЮ не печатаются: в образце ИЕНиМ их нет.
+% Бланк титула (как и образец) центрирован по физической странице, поэтому
+% на титуле поля симметричны (по 23,7 мм); после него \restoregeometry
+% возвращает основные поля 30/15/20/20 мм.
+% Интерлиньяж: \setstretch{0.95} даёт шаг строк ≈16,1 pt, как в бланке
+% (основной текст — 1,5). Грифы СОГЛАСОВАНО/УТВЕРЖДАЮ не печатаются:
+% в образце ИЕНиМ их нет.
+\newgeometry{left=23.7mm,right=23.7mm,top=20mm,bottom=20mm}
 \thispagestyle{empty}
 \begingroup
 \singlespacing
+\setstretch{0.95}
 \setlength{\parindent}{0pt}
 \hyphenpenalty=10000\exhyphenpenalty=10000
-
+% Первая строка бланка стоит на ~18 pt выше стандартной \topskip-позиции.
+\vspace*{-18.2pt}
 {\centering
 МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
-федеральное государственное автономное образовательное учреждение\\
-высшего образования\\
-УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ\\
+\makebox[\linewidth][c]{\hspace*{30pt}федеральное государственное автономное образовательное учреждение}\\
+\makebox[\linewidth][c]{\hspace*{30pt}высшего образования}\\
+\makebox[\linewidth][c]{\hspace*{30pt}УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ}\\
 имени первого Президента России Б.Н. Ельцина\par}
 
-\vspace{0.6\baselineskip}
-
+\vspace{1\baselineskip}
 {\centering \MakeUppercase{\VKRInstitute}\par}
 
-\vspace{3.4\baselineskip}
+\vspace{3.95\baselineskip}
 
 {\centering \VKRDepartment\par}
 
-\vspace{2.05\baselineskip}
+\vspace{1.99\baselineskip}
 
 {\centering
 \textbf{ХРОМАТОГРАФИЧЕСКОЕ ИССЛЕДОВАНИЕ}\\
 \textbf{СИСТЕМЫ ПОЛИЭТИЛЕНОКСИД–ХИТОЗАН}\par}
 
-\vspace{0.85\baselineskip}
+\vspace{1\baselineskip}
 
 {\centering
 Направление подготовки \VKRDirection\par}
 
-\vspace{1.95\baselineskip}
+\vspace{2.02\baselineskip}
 
 \noindent
-\begin{minipage}[t]{0.51\textwidth}
-\VKRHeadPosition:\\[0.2em]
-\VKRHeadDegree\ \VKRHeadName\\[2.2em]
-\rule{5.5cm}{0.4pt}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.48\textwidth}
+\begin{minipage}[t]{0.44\textwidth}
 \centering
-\VKRWorkType\\[1em]
-\textbf{\VKRStudentGenitiveTitle}\\[1.2em]
-\rule{5.5cm}{0.4pt}
-\end{minipage}
-
-\vspace{2\baselineskip}
-
-\noindent
-\begin{minipage}[t]{0.51\textwidth}
-Нормоконтролер:\\[0.2em]
-\VKRNormControlDegree\ \VKRNormControlName\\[2.2em]
-\rule{4.5cm}{0.4pt}
+\makebox[\linewidth][c]{\VKRHeadPosition}\\
+\VKRHeadDegree\ \VKRHeadName
 \end{minipage}\hfill
-\begin{minipage}[t]{0.48\textwidth}
-Научный руководитель:\\[0.2em]
-\VKRAdvisorDegree\ \VKRAdvisor\\[2.2em]
-Научный соруководитель:\\[0.2em]
-\VKRSorukovoditelDegree\ \VKRSorukovoditelName\\[1.5em]
-\rule{5.5cm}{0.4pt}
+\begin{minipage}[t]{0.487\textwidth}
+\centering
+\VKRWorkType\\[0.95em]
+\textbf{\VKRStudentGenitiveTitle}
 \end{minipage}
+
+% Линии для подписей: ширина и положение — как в образце ИЕНиМ (с. 24).
+\vspace{20.6pt}
+\noindent\hspace*{-21.67pt}\rule{247.3pt}{0.4pt}\hfill\rule{207.5pt}{0.4pt}\hspace*{8.2pt}\par
+
+\vspace{9.7pt}
+\noindent
+\begin{minipage}[t]{0.44\textwidth}
+\centering
+\hspace*{10pt}Нормоконтролер:\\
+\hspace*{10pt}\VKRNormControlDegree\ \VKRNormControlName
+\end{minipage}\hfill
+\begin{minipage}[t]{0.487\textwidth}
+\centering
+Научный руководитель:\\
+\VKRAdvisorDegree\ \VKRAdvisorInitials\\\VKRAdvisorSurname
+\end{minipage}
+
+\vspace{40pt}
+\noindent\hspace*{-21.67pt}\rule{247.3pt}{0.4pt}\hfill\rule{207.5pt}{0.4pt}\hspace*{8.2pt}\par
+
+\vspace{9.9pt}
+{\centering
+\makebox[\linewidth][c]{\hspace*{242.2pt}Научный соруководитель:}\\
+\makebox[\linewidth][c]{\hspace*{242.2pt}\VKRSorukovoditelDegree\ \VKRSorukovoditelName}\par}
+
+\vspace{24.3pt}
+\noindent\hspace*{246.93pt}\rule{207.5pt}{0.4pt}\par
 
 \vfill
 
 {\centering
 \VKRPlace\\
 \VKRYear\par}
+% зазор бланка под последней строкой (совпадает с образцом)
+\vspace*{24.5pt}
 \endgroup
 \clearpage
+% Возвращаем основные поля 30/15/20/20 мм для всего остального документа.
+\restoregeometry
 
 % Титульный лист учитывается в общей нумерации, но цифра на нём не печатается.
 \setcounter{page}{2}
