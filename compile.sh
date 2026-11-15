@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-# Сборка PDF из указанного .tex-файла: compile.sh <файл.tex>
-#
-# Внутри `nix develop` скрипт работает напрямую (VKR_ENV=1 выставляет
-# shellHook). Вне оболочки он один раз перезапускается через `nix develop`,
-# поэтому активировать окружение вручную не нужно.
 set -euo pipefail
 
 die() { echo "compile.sh: $*" >&2; exit 1; }
@@ -23,7 +18,6 @@ if [ "${VKR_ENV:-}" != "1" ]; then
   exec nix develop "$(dirname "$self")" --command bash "$self" "$@"
 fi
 
-# latexmk запускается из каталога файла: рабочие файлы и PDF лягут рядом с ним.
 cd "$(dirname "$src")"
 base=$(basename "$src")
 
