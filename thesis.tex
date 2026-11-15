@@ -82,6 +82,13 @@
 \makeatletter
 \renewcommand{\@oddfoot}{\hfil\thepage\hfil}
 \renewcommand{\@evenfoot}{\hfil\thepage\hfil}
+% Колонтитул для бланка задания: там поля 20/20 мм, текстовая полоса шире,
+% и номер «по центру полосы» уехал бы на 21 pt влево относительно остальных
+% страниц. Сдвигаем его так, чтобы номера стояли на одной вертикали.
+\newcommand{\ps@vkrfooter}{%
+  \renewcommand{\@oddhead}{}\renewcommand{\@evenhead}{}%
+  \renewcommand{\@oddfoot}{\hspace*{42.52pt}\hfil\thepage\hfil}%
+  \renewcommand{\@evenfoot}{\hspace*{42.52pt}\hfil\thepage\hfil}}
 \makeatother
 
 % Нумерация рисунков, таблиц и формул — по разделу: Рисунок 2.1, Таблица 3.1, (4.1).
@@ -274,46 +281,95 @@
 \setcounter{page}{2}
 
 % ================================ ЗАДАНИЕ ===================================
-% Бланк задания для печати и подписания. Подписанный скан можно вставить
-% вместо этой страницы, сохранив номер страницы 2.
+% Бланк задания по форме инструкции ВКР 2026 (3_Задание_ВКР.pdf):
+% поля 20/20/20/20 мм, кегль 14 pt, шаг строк ≈16,1 pt.
+% Подписанный скан можно вставить вместо этой страницы, сохранив номер 2.
+\newgeometry{left=20mm,right=20mm,top=20mm,bottom=20mm}
+\thispagestyle{vkrfooter}
+\begingroup
+\singlespacing
+\setstretch{0.95}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+% Линия заполняемого поля: на 1 pt ниже базовой линии.
+\newcommand{\vkrblank}[1]{\rule[-1pt]{#1}{0.4pt}}
+% Распорка для строк 10 pt: \strut сохраняет размеры 14 pt.
+\newcommand{\vkrsmallstrut}{\vrule height 8.68pt depth 3.72pt width 0pt}
+\vspace*{-18.2pt}
+{\centering
+МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+\makebox[\linewidth][c]{\hspace*{30pt}федеральное государственное автономное образовательное учреждение}\\
+\makebox[\linewidth][c]{\hspace*{30pt}высшего образования}\\
+\makebox[\linewidth][c]{\hspace*{30pt}УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ}\\
+имени первого Президента России Б.Н. Ельцина\par}
 
-\begin{flushright}
-УТВЕРЖДАЮ\\[0.2em]
-Руководитель образовательной программы\\[0.5em]
-\underline{\hspace{4cm}}\quad(\underline{\hspace{2.6cm}})\\[0.3em]
-«\underline{\hspace{0.8cm}}» \underline{\hspace{3cm}} 20\underline{\hspace{0.5cm}} г.
-\end{flushright}
+\vspace{1\baselineskip}
 
-\vspace{0.5em}
-\noindent Код, наименование направления: \VKRDirection\\
-\noindent Наименование программы: \underline{\hspace{0.55\linewidth}}\\
-\noindent Группа: \VKRGruppa
+{\centering \MakeUppercase{\VKRInstitute}\par}
 
-\begin{center}
-\textbf{ЗАДАНИЕ}\\
-на выполнение выпускной квалификационной работы
-\end{center}
+\vspace*{31.83pt}
+\noindent\strut\makebox[\linewidth][r]{%
+  \raisebox{0pt}[0pt][0pt]{\begin{minipage}[t]{258.6pt}\centering
+    \strut УТВЕРЖДАЮ\\[16.17pt]
+    \strut Руководитель образовательной программы\\[16.27pt]
+    \strut\vkrblank{139.7pt}\hspace{4.3pt}(\vkrblank{105.2pt})\\[16.17pt]
+    \strut\makebox[\linewidth][r]{«\vkrblank{27.8pt}»\hspace{0.8pt}\vkrblank{121.9pt}\hspace{0.4pt}20\vkrblank{16.8pt}\hspace{0.4pt}г.}
+  \end{minipage}}\hspace*{-16pt}}
 
-\noindent студента \VKRStudentGenitive\\
-(Фамилия, имя, отчество)
+\vspace*{129.38pt}
+\noindent\strut Код, наименование направления: \vkrblank{278.9pt}\par
+\vspace*{0pt}
+\noindent\strut Наименование программы: \vkrblank{314.4pt}\par
+\vspace*{0pt}
+\noindent\strut Группа:\hspace{1pt}\vkrblank{164.1pt}\par
 
-\noindent Квалификация: бакалавр\\
-(бакалавр, специалист, магистр)
+\vspace*{32.23pt}
+\noindent\strut\makebox[\linewidth][c]{\textbf{ЗАДАНИЕ}}\par
+\vspace*{-0.19pt}
+\noindent\strut\makebox[\linewidth][c]{\hspace*{-5.7pt}на выполнение выпускной квалификационной работы}\par
 
-{\hyphenpenalty=10000\exhyphenpenalty=10000
-\noindent Провести научное исследование по теме: \VKRTitle\par}
+\vspace*{16.47pt}
+\noindent\strut студента \vkrblank{412.8pt}\par
 
-\begin{center}
-Срок представления работы научному руководителю:\\
-«\underline{\hspace{0.8cm}}» \underline{\hspace{1.6cm}} 20\underline{\hspace{0.55cm}} г.
-\end{center}
+\vspace*{-2.07pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\makebox[\linewidth][c]{\hspace*{-3.6pt}(Фамилия, имя, отчество)}\par}
 
-\noindent Научный руководитель \hfill \underline{\hspace{4.5cm}}\quad(Подпись)
-\\(\VKRAdvisor)
+\vspace*{15.37pt}
+\noindent\strut Квалификация:\hspace{4.1pt}\vkrblank{370.5pt}\par
 
-\vspace{0.5em}
-\noindent Задание принял к исполнению \hfill \underline{\hspace{3.5cm}}\\
-(Подпись)
+\vspace*{-2.18pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\makebox[\linewidth][c]{\hspace*{-3.4pt}(бакалавр, специалист, магистр)}\par}
+
+\vspace*{15.38pt}
+% Тема длинная: выравнивание влево, иначе TeX растянет пробелы в строке.
+{\raggedright
+\noindent\strut Провести научное исследование по теме:\hspace{7.1pt}\VKRTitle\par}
+
+% Тема занимает две строки бланка (шаг 16,1 pt); линия поля идёт под второй.
+\vspace*{2.88pt}
+\noindent\strut\rule{469.3pt}{0.4pt}\par
+
+\vspace*{12.37pt}
+\noindent\strut Срок представления работы научному руководителю: «\vkrblank{20.1pt}»\hspace{0.8pt}\vkrblank{59pt}\hspace{0.4pt}20\vkrblank{24pt}\hspace{0.4pt}г.\par
+
+\vspace*{32.33pt}
+\noindent\strut Научный руководитель\hspace{6.5pt}\vkrblank{170.9pt}(\vkrblank{136.3pt})\par
+
+\vspace*{-2.07pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\hspace*{180pt}(Подпись)\hspace*{136.4pt}(И.О. Фамилия)\par}
+
+\vspace*{15.37pt}
+\noindent\strut Задание принял к исполнению \vkrblank{125.8pt}\par
+
+\vspace*{-2.18pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\hspace*{216pt}(Подпись)\par}
+\endgroup
+\clearpage
+\restoregeometry
 
 % =============================== РЕФЕРАТ ====================================
 \fronttitle{РЕФЕРАТ}
