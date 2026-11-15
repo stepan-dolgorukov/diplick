@@ -54,7 +54,7 @@
               unset LD_LIBRARY_PATH
               export VKR_ENV=1
               echo "ВКР: $(xelatex --version | head -1 | sed 's/^XeTeX [^ ]* //'), latexmk $(latexmk -v | sed -n 's/.*Version \([0-9.]*\).*/\1/p')"
-              echo "Сборка: ./compile.sh thesis.tex"
+              echo "Сборка: ./compile.sh thesis/thesis.tex"
             '';
           };
         });

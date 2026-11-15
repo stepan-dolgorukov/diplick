@@ -1,0 +1,491 @@
+% !TEX program = xelatex
+% Заготовка ВКР по требованиям ИЕНиМ (2024) и ГОСТ 7.32–2017.
+% Запуск: latexmk -xelatex -interaction=nonstopmode thesis/thesis.tex
+\documentclass[a4paper,14pt]{extarticle}
+
+% extsizes с опцией 14pt берёт классический \@xivpt, то есть 14,4 pt.
+% Требование — ровно 14 pt (ИЕНиМ, с. 12; УрФУ, с. 15), поэтому
+% переопределяем \normalsize: кегль 14 pt, интерлиньяж 17 pt.
+\makeatletter
+\renewcommand\normalsize{\@setfontsize\normalsize{14}{17}}
+\makeatother
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\newfontfamily\cyrillicfont{Times New Roman}[Script=Cyrillic]
+\newfontfamily\cyrillicfontsf{Times New Roman}[Script=Cyrillic]
+\newfontfamily\cyrillicfonttt{Liberation Mono}
+
+\usepackage[left=30mm,right=15mm,top=20mm,bottom=20mm]{geometry}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmathfont{TeX Gyre Termes Math}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{3em}
+\tolerance=2000
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% Заголовки: структурные элементы — по центру, разделы — с абзаца.
+% Переносы в заголовках запрещены (ИЕНиМ, с. 13; УрФУ, с. 40).
+\titleformat{\section}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesection}{0.5em}{}
+\titlespacing*{\section}{1.25cm}{1.5\baselineskip}{1\baselineskip}
+\titleformat{\subsection}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{1.25cm}{1\baselineskip}{0.5\baselineskip}
+\titleformat{\subsubsection}[block]{\bfseries\normalsize\hyphenpenalty=10000\exhyphenpenalty=10000}{\thesubsubsection}{0.5em}{}
+\titlespacing*{\subsubsection}{1.25cm}{0.75\baselineskip}{0.25\baselineskip}
+
+% Структурный заголовок: прописными, полужирным, по центру строки.
+% Отступ 1,25 см здесь не применяется — только к разделам и подразделам.
+\makeatletter
+\newcommand{\structheading}[1]{%
+  \phantomsection
+  \begingroup
+    \centering
+    \parindent=0pt
+    \hyphenpenalty=10000\exhyphenpenalty=10000
+    \textbf{#1}\par
+  \endgroup
+  \vspace{0.5\baselineskip}}
+\newcommand{\structtitle}[1]{%
+  \clearpage
+  \structheading{#1}%
+  \addcontentsline{toc}{section}{#1}}
+\newcommand{\fronttitle}[1]{%
+  \clearpage
+  \structheading{#1}}
+\newcommand{\vkrtableofcontents}{\@starttoc{toc}}
+% Отточие после каждого элемента содержания (ИЕНиМ, с. 10; УрФУ, с. 24).
+\renewcommand{\l@section}{\@dottedtocline{1}{0pt}{1.5em}}
+\makeatother
+
+% Подписи: 12 pt, разделитель — тире (ИЕНиМ, с. 14–16; УрФУ, с. 49).
+% Подпись рисунка: одна строка — по центру, несколько — по ширине.
+% Название таблицы: слева, без абзацного отступа.
+\DeclareCaptionFont{vkrcaption}{\small}
+\captionsetup{font=vkrcaption,labelsep=endash,justification=justified,singlelinecheck=true}
+\captionsetup[table]{justification=raggedright,singlelinecheck=false,indention=0pt}
+
+\pagestyle{plain}
+\makeatletter
+\renewcommand{\@oddfoot}{\hfil\thepage\hfil}
+\renewcommand{\@evenfoot}{\hfil\thepage\hfil}
+% Колонтитул для бланка задания: там поля 20/20 мм, текстовая полоса шире,
+% и номер «по центру полосы» уехал бы на 21 pt влево относительно остальных
+% страниц. Сдвигаем его так, чтобы номера стояли на одной вертикали.
+\newcommand{\ps@vkrfooter}{%
+  \renewcommand{\@oddhead}{}\renewcommand{\@evenhead}{}%
+  \renewcommand{\@oddfoot}{\hspace*{42.52pt}\hfil\thepage\hfil}%
+  \renewcommand{\@evenfoot}{\hspace*{42.52pt}\hfil\thepage\hfil}}
+\makeatother
+
+% Нумерация рисунков, таблиц и формул — по разделу: Рисунок 2.1, Таблица 3.1, (4.1).
+% ИЕНиМ, с. 14–16. Для приложения А:
+% \renewcommand{\thefigure}{А.\arabic{figure}}\setcounter{figure}{0}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{equation}{section}
+
+% ИЕНиМ, с. 16: выше и ниже выключной формулы — не менее одной свободной строки.
+\AtBeginDocument{%
+  \setlength{\abovedisplayskip}{\baselineskip}%
+  \setlength{\belowdisplayskip}{\baselineskip}%
+  \setlength{\abovedisplayshortskip}{\baselineskip}%
+  \setlength{\belowdisplayshortskip}{\baselineskip}}
+
+% Список источников: арабские цифры без точки, с абзацного отступа (ИЕНиМ, с. 18).
+\newcounter{source}
+\newenvironment{sourcelist}{%
+  \begin{list}{\arabic{source}}{%
+    \usecounter{source}%
+    \setlength{\leftmargin}{\dimexpr\parindent+1.2em\relax}%
+    \setlength{\labelwidth}{0.7em}%
+    \setlength{\labelsep}{0.5em}%
+    \setlength{\itemindent}{0pt}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parsep}{0pt}%
+    \setlength{\topsep}{0pt}%
+    \setlength{\partopsep}{0pt}}%
+}{\end{list}}
+
+% Строки реферата: подчёркивание не выходит за правое поле.
+\newlength{\refw}
+\newcommand{\refblankline}[1]{%
+  \par
+  \noindent\hspace*{\parindent}%
+  \settowidth{\refw}{#1}%
+  #1\underline{\hspace{\dimexpr\linewidth-\parindent-\refw-0.5em\relax}}\par}
+\newcommand{\refkeywords}[1]{%
+  \par
+  \noindent
+  \settowidth{\refw}{#1}%
+  #1\ \underline{\hspace{\dimexpr\linewidth-\refw-0.5em\relax}}\par}
+
+% —————————————————————————
+% Данные работы (замените значения перед началом набора текста)
+% Эти макросы выводятся и на титульном листе, и в задании, и в реферате.
+% —————————————————————————
+\newcommand{\VKRTitle}{ХРОМАТОГРАФИЧЕСКОЕ ИССЛЕДОВАНИЕ СИСТЕМЫ ПОЛИЭТИЛЕНОКСИД–ХИТОЗАН}
+\newcommand{\VKRStudent}{Смирнов Юрий Викторович}
+\newcommand{\VKRStudentGenitive}{Смирнова Юрия Викторовича}
+% Для титула Ф. И. О. разбивается на две строки, как в образце ИЕНиМ (с. 24).
+\newcommand{\VKRStudentGenitiveTitle}{Смирнова Юрия\\Викторовича}
+\newcommand{\VKRGruppa}{\underline{\hspace{2.5cm}}}
+\newcommand{\VKRDirection}{04.03.01 «Химия»}
+% Образовательная программа указывается при наличии нескольких программ
+% направления подготовки (ИЕНиМ, с. 24, сноска 11).
+\newcommand{\VKRProgram}{«Химия»}
+\newcommand{\VKRInstitute}{Институт естественных наук и математики}
+\newcommand{\VKRInstituteLoc}{Институте естественных наук и математики}
+\newcommand{\VKRDepartment}{Кафедра органической химии и высокомолекулярных соединений/ Департамент фундаментальной и прикладной химии}
+\newcommand{\VKRDepartmentLoc}{кафедре органической химии и высокомолекулярных соединений}
+\newcommand{\VKRHeadPosition}{Зав.~кафедрой/директор~департамента:}
+\newcommand{\VKRHeadDegree}{д.~х.~н., проф.}
+\newcommand{\VKRHeadName}{В.~Я.~Сосновских}
+\newcommand{\VKRNormControlDegree}{к.~х.~н., доц.}
+\newcommand{\VKRNormControlName}{Л.~В.~Адамова}
+\newcommand{\VKRAdvisorDegree}{к.~х.~н., доц.}
+\newcommand{\VKRAdvisorInitials}{И.~С.}
+\newcommand{\VKRAdvisorSurname}{Иванов}
+\newcommand{\VKRAdvisor}{\VKRAdvisorInitials\ \VKRAdvisorSurname}
+\newcommand{\VKRSorukovoditelDegree}{к.~х.~н., доц.}
+\newcommand{\VKRSorukovoditelName}{И.~С.~Иванов}
+\newcommand{\VKRWorkType}{Выпускная квалификационная работа бакалавра}
+\newcommand{\VKRYear}{2026}
+\newcommand{\VKRPlace}{Екатеринбург}
+
+\hypersetup{
+  pdftitle={\VKRTitle},
+  pdfauthor={\VKRStudent},
+  pdfsubject={Выпускная квалификационная работа}
+}
+
+\begin{document}
+
+% polyglossia выбирает язык при \begin{document} и перезаписывает названия
+% элементов, поэтому задаём их здесь, после выбора языка.
+\renewcommand{\contentsname}{СОДЕРЖАНИЕ}
+\renewcommand{\refname}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ И ЛИТЕРАТУРЫ}
+\renewcommand{\figurename}{Рисунок}
+\renewcommand{\tablename}{Таблица}
+
+% =============================== ТИТУЛЬНЫЙ ЛИСТ =============================
+% Векторный титульный лист по образцу ИЕНиМ (2024), с. 24–26.
+% Бланк титула (как и образец) центрирован по физической странице, поэтому
+% на титуле поля симметричны (по 23,7 мм); после него \restoregeometry
+% возвращает основные поля 30/15/20/20 мм.
+% Интерлиньяж: \setstretch{0.95} даёт шаг строк ≈16,1 pt, как в бланке
+% (основной текст — 1,5). Грифы СОГЛАСОВАНО/УТВЕРЖДАЮ не печатаются:
+% в образце ИЕНиМ их нет.
+\newgeometry{left=23.7mm,right=23.7mm,top=20mm,bottom=20mm}
+\thispagestyle{empty}
+\begingroup
+\singlespacing
+\setstretch{0.95}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+% Первая строка бланка стоит на ~18 pt выше стандартной \topskip-позиции.
+\vspace*{-18.2pt}
+{\centering
+МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+\makebox[\linewidth][c]{\hspace*{30pt}федеральное государственное автономное образовательное учреждение}\\
+\makebox[\linewidth][c]{\hspace*{30pt}высшего образования}\\
+\makebox[\linewidth][c]{\hspace*{30pt}УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ}\\
+имени первого Президента России Б.Н. Ельцина\par}
+
+\vspace{1\baselineskip}
+{\centering \MakeUppercase{\VKRInstitute}\par}
+
+\vspace{3.95\baselineskip}
+
+{\centering \VKRDepartment\par}
+
+\vspace{1.99\baselineskip}
+
+{\centering
+\textbf{ХРОМАТОГРАФИЧЕСКОЕ ИССЛЕДОВАНИЕ}\\
+\textbf{СИСТЕМЫ ПОЛИЭТИЛЕНОКСИД–ХИТОЗАН}\par}
+
+\vspace{1\baselineskip}
+
+{\centering
+Направление подготовки \VKRDirection\par}
+
+\vspace{2.02\baselineskip}
+
+\noindent
+\begin{minipage}[t]{0.44\textwidth}
+\centering
+\makebox[\linewidth][c]{\VKRHeadPosition}\\
+\VKRHeadDegree\ \VKRHeadName
+\end{minipage}\hfill
+\begin{minipage}[t]{0.487\textwidth}
+\centering
+\VKRWorkType\\[0.95em]
+\textbf{\VKRStudentGenitiveTitle}
+\end{minipage}
+
+% Линии для подписей: ширина и положение — как в образце ИЕНиМ (с. 24).
+\vspace{20.6pt}
+\noindent\hspace*{-21.67pt}\rule{247.3pt}{0.4pt}\hfill\rule{207.5pt}{0.4pt}\hspace*{8.2pt}\par
+
+\vspace{9.7pt}
+\noindent
+\begin{minipage}[t]{0.44\textwidth}
+\centering
+\hspace*{10pt}Нормоконтролер:\\
+\hspace*{10pt}\VKRNormControlDegree\ \VKRNormControlName
+\end{minipage}\hfill
+\begin{minipage}[t]{0.487\textwidth}
+\centering
+Научный руководитель:\\
+\VKRAdvisorDegree\ \VKRAdvisorInitials\\\VKRAdvisorSurname
+\end{minipage}
+
+\vspace{40pt}
+\noindent\hspace*{-21.67pt}\rule{247.3pt}{0.4pt}\hfill\rule{207.5pt}{0.4pt}\hspace*{8.2pt}\par
+
+\vspace{9.9pt}
+{\centering
+\makebox[\linewidth][c]{\hspace*{242.2pt}Научный соруководитель:}\\
+\makebox[\linewidth][c]{\hspace*{242.2pt}\VKRSorukovoditelDegree\ \VKRSorukovoditelName}\par}
+
+\vspace{24.3pt}
+\noindent\hspace*{246.93pt}\rule{207.5pt}{0.4pt}\par
+
+\vfill
+
+{\centering
+\VKRPlace\\
+\VKRYear\par}
+% зазор бланка под последней строкой (совпадает с образцом)
+\vspace*{24.5pt}
+\endgroup
+\clearpage
+% Возвращаем основные поля 30/15/20/20 мм для всего остального документа.
+\restoregeometry
+
+% Титульный лист учитывается в общей нумерации, но цифра на нём не печатается.
+\setcounter{page}{2}
+
+% ================================ ЗАДАНИЕ ===================================
+% Бланк задания по форме инструкции ВКР 2026 (3_Задание_ВКР.pdf):
+% поля 20/20/20/20 мм, кегль 14 pt, шаг строк ≈16,1 pt.
+% Подписанный скан можно вставить вместо этой страницы, сохранив номер 2.
+\newgeometry{left=20mm,right=20mm,top=20mm,bottom=20mm}
+\thispagestyle{vkrfooter}
+\begingroup
+\singlespacing
+\setstretch{0.95}
+\setlength{\parindent}{0pt}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+% Линия заполняемого поля: на 1 pt ниже базовой линии.
+\newcommand{\vkrblank}[1]{\rule[-1pt]{#1}{0.4pt}}
+% Распорка для строк 10 pt: \strut сохраняет размеры 14 pt.
+\newcommand{\vkrsmallstrut}{\vrule height 8.68pt depth 3.72pt width 0pt}
+\vspace*{-18.2pt}
+{\centering
+МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ\\
+\makebox[\linewidth][c]{\hspace*{30pt}федеральное государственное автономное образовательное учреждение}\\
+\makebox[\linewidth][c]{\hspace*{30pt}высшего образования}\\
+\makebox[\linewidth][c]{\hspace*{30pt}УРАЛЬСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ}\\
+имени первого Президента России Б.Н. Ельцина\par}
+
+\vspace{1\baselineskip}
+
+{\centering \MakeUppercase{\VKRInstitute}\par}
+
+\vspace*{31.83pt}
+\noindent\strut\makebox[\linewidth][r]{%
+  \raisebox{0pt}[0pt][0pt]{\begin{minipage}[t]{258.6pt}\centering
+    \strut УТВЕРЖДАЮ\\[16.17pt]
+    \strut Руководитель образовательной программы\\[16.27pt]
+    \strut\vkrblank{139.7pt}\hspace{4.3pt}(\vkrblank{105.2pt})\\[16.17pt]
+    \strut\makebox[\linewidth][r]{«\vkrblank{27.8pt}»\hspace{0.8pt}\vkrblank{121.9pt}\hspace{0.4pt}20\vkrblank{16.8pt}\hspace{0.4pt}г.}
+  \end{minipage}}\hspace*{-16pt}}
+
+\vspace*{129.38pt}
+\noindent\strut Код, наименование направления: \vkrblank{278.9pt}\par
+\vspace*{0pt}
+\noindent\strut Наименование программы: \vkrblank{314.4pt}\par
+\vspace*{0pt}
+\noindent\strut Группа:\hspace{1pt}\vkrblank{164.1pt}\par
+
+\vspace*{32.23pt}
+\noindent\strut\makebox[\linewidth][c]{\textbf{ЗАДАНИЕ}}\par
+\vspace*{-0.19pt}
+\noindent\strut\makebox[\linewidth][c]{\hspace*{-5.7pt}на выполнение выпускной квалификационной работы}\par
+
+\vspace*{16.47pt}
+\noindent\strut студента \vkrblank{412.8pt}\par
+
+\vspace*{-2.07pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\makebox[\linewidth][c]{\hspace*{-3.6pt}(Фамилия, имя, отчество)}\par}
+
+\vspace*{15.37pt}
+\noindent\strut Квалификация:\hspace{4.1pt}\vkrblank{370.5pt}\par
+
+\vspace*{-2.18pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\makebox[\linewidth][c]{\hspace*{-3.4pt}(бакалавр, специалист, магистр)}\par}
+
+\vspace*{15.38pt}
+% Тема длинная: выравнивание влево, иначе TeX растянет пробелы в строке.
+{\raggedright
+\noindent\strut Провести научное исследование по теме:\hspace{7.1pt}\VKRTitle\par}
+
+% Тема занимает две строки бланка (шаг 16,1 pt); линия поля идёт под второй.
+\vspace*{2.88pt}
+\noindent\strut\rule{469.3pt}{0.4pt}\par
+
+\vspace*{12.37pt}
+\noindent\strut Срок представления работы научному руководителю: «\vkrblank{20.1pt}»\hspace{0.8pt}\vkrblank{59pt}\hspace{0.4pt}20\vkrblank{24pt}\hspace{0.4pt}г.\par
+
+\vspace*{32.33pt}
+\noindent\strut Научный руководитель\hspace{6.5pt}\vkrblank{170.9pt}(\vkrblank{136.3pt})\par
+
+\vspace*{-2.07pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\hspace*{180pt}(Подпись)\hspace*{136.4pt}(И.О. Фамилия)\par}
+
+\vspace*{15.37pt}
+\noindent\strut Задание принял к исполнению \vkrblank{125.8pt}\par
+
+\vspace*{-2.18pt}
+{\fontsize{10}{12.4}\selectfont\baselineskip=12.4pt
+\noindent\vkrsmallstrut\hspace*{216pt}(Подпись)\par}
+\endgroup
+\clearpage
+\restoregeometry
+
+% =============================== РЕФЕРАТ ====================================
+\fronttitle{РЕФЕРАТ}
+Отчет \underline{\hspace{1.2cm}} с., \underline{\hspace{0.8cm}} рис., \underline{\hspace{0.8cm}} табл., \underline{\hspace{1.2cm}} источн., \underline{\hspace{0.8cm}} прил.
+
+\refkeywords{Ключевые слова:}
+\refblankline{Объект исследования~— }
+\refblankline{Цель работы~— }
+\refblankline{Методы исследования~— }
+\refblankline{Результаты и их новизна~— }
+\refblankline{Область применения~— }
+\refblankline{Значимость работы~— }
+
+\fronttitle{МЕСТО ВЫПОЛНЕНИЯ РАБОТЫ}
+Работа выполнена в \VKRInstituteLoc, на \VKRDepartmentLoc{} Уральского федерального университета, г.~\VKRPlace.
+
+% =============================== СОДЕРЖАНИЕ =================================
+\fronttitle{\contentsname}
+\vkrtableofcontents
+
+% ========================= ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ =========================
+\structtitle{ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ}
+В настоящей работе применяют следующие обозначения и сокращения.
+
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.73\textwidth}@{}}
+ВКР & — выпускная квалификационная работа\\
+Добавьте & — расшифровка сокращения
+\end{tabular}
+
+% ================================ ВВЕДЕНИЕ ==================================
+\structtitle{ВВЕДЕНИЕ}
+Во введении необходимо обосновать актуальность темы, сформулировать объект и предмет исследования, цель и задачи работы, методы исследования, научную новизну, практическую значимость и положения, выносимые на защиту.
+
+% =============================== ОСНОВНАЯ ЧАСТЬ =============================
+\clearpage\section{Обзор литературы}
+Текст подраздела. Ссылки на источники оформляются в квадратных скобках, например [1].
+
+\clearpage\section{Постановка задачи}
+Сформулируйте исследовательскую задачу и критерии оценки результатов.
+
+\clearpage\section{Методика эксперимента}
+\subsection{Материалы и оборудование}
+Опишите объект исследования, материалы, приборы и условия эксперимента.
+\subsection{Методика проведения исследования}
+Опишите последовательность теоретических и экспериментальных процедур.
+
+\clearpage\section{Результаты и их обсуждение}
+\subsection{Результаты}
+Представьте результаты с необходимыми рисунками, таблицами и расчетами.
+
+% Пример оформления рисунка — замените изображение и подпись своим материалом.
+\begin{figure}[htbp]
+  \centering
+  \fbox{\rule{0pt}{3cm}\rule{8cm}{0pt}}
+  \caption{Пример оформления рисунка}
+  \label{fig:example}
+\end{figure}
+
+На рисунке~\ref{fig:example} приведен пример оформления иллюстрации.
+
+% Пример оформления таблицы — замените данные своим материалом.
+В таблице~\ref{tab:example} приведен пример оформления табличных данных.
+
+\begin{table}[htbp]
+  \caption{Пример оформления таблицы}
+  \label{tab:example}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    Показатель & Значение 1 & Значение 2 \\
+    \midrule
+    Пример & 1,0 & 2,0 \\
+    Пример & 3,0 & 4,0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% Пример оформления формулы — замените своим материалом.
+Уравнение состояния идеального газа имеет вид
+\begin{equation}
+  pV = nRT,
+  \label{eq:state}
+\end{equation}
+
+где $p$ — давление; $V$ — объем; $n$ — количество вещества; $R$ — универсальная газовая постоянная; $T$ — температура.
+
+Формула~\eqref{eq:state} приведена в качестве примера оформления.
+
+\subsection{Обсуждение результатов}
+Сопоставьте результаты с опубликованными данными и оцените достоверность.
+Дополнительные материалы, необходимые для понимания результатов, приведены в приложении~А.
+
+\structtitle{ЗАКЛЮЧЕНИЕ (ВЫВОДЫ)}
+Сформулируйте краткие выводы по задачам, оцените полноту решения, практическую значимость и возможные направления дальнейшей работы.
+
+\structtitle{\refname}
+\begin{sloppypar}
+\begin{sourcelist}
+  \item Автор. Название источника. – Место издания : Издательство, год. – 100 с.
+  \item Автор статьи. Название статьи // Журнал. – 2024. – Т. 35, № 1. – С. 1–10.
+\end{sourcelist}
+\end{sloppypar}
+
+% =============================== ПРИЛОЖЕНИЕ =================================
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{ПРИЛОЖЕНИЕ А (обязательное). ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ}
+\begingroup
+  \centering
+  \parindent=0pt
+  \hyphenpenalty=10000\exhyphenpenalty=10000
+  \textbf{ПРИЛОЖЕНИЕ А}\par
+  (обязательное)\par
+  \textbf{ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ}\par
+\endgroup
+\vspace{0.5\baselineskip}
+
+Материалы приложения, необходимые для понимания результатов исследования. Каждое следующее приложение начинайте с новой страницы.
+
+\end{document}

@@ -12,12 +12,12 @@
 
 В репозитории **восемь файлов**:
 
-- `thesis.tex` — **главный** файл шаблона ВКР. Собирается XeLaTeX +
+- `thesis/thesis.tex` — **главный** файл шаблона ВКР. Собирается XeLaTeX +
   `latexmk`; результат — `thesis.pdf`.
-- `report.tex` — самостоятельный бланк отзыва руководителя ВКР по форме
+- `report/report.tex` — самостоятельный бланк отзыва руководителя ВКР по форме
   инструкции ВКР 2026; результат — `report.pdf` (см. § 32).
 - `AGENTS.md` — этот файл: требования, карта шаблона, рецепты и запреты.
-- `compile.sh` — сборка PDF: `./compile.sh thesis.tex` (вне `nix develop` сам
+- `compile.sh` — сборка PDF: `./compile.sh thesis/thesis.tex` (вне `nix develop` сам
   перезапускается через него).
 - `flake.nix`, `flake.lock` — окружение сборки: TeX Live (XeLaTeX, `latexmk`,
   нужные пакеты), Times New Roman (`corefonts`), Liberation Mono, `poppler-utils`.
@@ -26,7 +26,7 @@
 
 Нормативные документы в репозитории: их требования перенесены в § 1–24.
 Сборка не требует никаких внешних файлов: титул, задание и все примеры
-набраны прямо в `thesis.tex`.
+набраны прямо в `thesis/thesis.tex`.
 
 **Главное правило:** ничего не «улучшать» по памяти. Любое изменение
 оформления должно опираться на конкретное требование из § 1–24 (с указанием
@@ -73,8 +73,8 @@
 
 ```bash
 cd /home/sdd/programming/diplick
-./compile.sh thesis.tex
-./compile.sh report.tex
+./compile.sh thesis/thesis.tex
+./compile.sh report/report.tex
 ```
 
 Внутри `nix develop` он работает напрямую, снаружи — один раз перезапускается
@@ -87,7 +87,7 @@ PDF и рабочие файлы появляются рядом с `.tex`-фа�
 
 ```bash
 cd /home/sdd/programming/diplick
-env -u LD_LIBRARY_PATH latexmk -xelatex -interaction=nonstopmode -halt-on-error thesis.tex
+env -u LD_LIBRARY_PATH latexmk -xelatex -interaction=nonstopmode -halt-on-error thesis/thesis.tex
 ```
 
 `latexmk` сам делает столько проходов, сколько нужно для содержания и ссылок.
@@ -835,7 +835,7 @@ Roman (через `unicode-math` + `TeX Gyre Termes Math`), гарнитура �
 
 ### 20.2. Как устроен титул в шаблоне
 
-Титул **векторный** и набран прямо в `thesis.tex` (блок
+Титул **векторный** и набран прямо в `thesis/thesis.tex` (блок
 «ТИТУЛЬНЫЙ ЛИСТ»). Внешние файлы не нужны. Особенности:
 
 - титул набирается **одинарным** интервалом с `\setstretch{0.95}` (шаг строк
@@ -1166,7 +1166,7 @@ right=23.7mm,…}` на одну страницу), потому что инач
 - Отвечать по-русски, если пользователь пишет по-русски.
 - Перед изменением оформления найти требование в § 1–24 и сослаться на
   страницу нормативного документа.
-- Перед внесением **любых** изменений в `thesis.tex` убедиться, что не были
+- Перед внесением **любых** изменений в `thesis/thesis.tex` убедиться, что не были
   нарушены требования, зафиксированные в нормативных документах:
   `vkr_requirements_ienim_2024.pdf` (Положение ИЕНиМ УрФУ о ВКР, 2024) и
   `vkr_requirements_urfu_2022.pdf` (общеуниверситетский стандарт УрФУ, 2022);
@@ -1232,7 +1232,7 @@ right=23.7mm,…}` на одну страницу), потому что инач
 
 ## 30. Ограничения и известные проблемы
 
-- **В репозитории** находятся `thesis.tex`, `report.tex`, `AGENTS.md`,
+- **В репозитории** находятся `thesis/thesis.tex`, `report/report.tex`, `AGENTS.md`,
   `compile.sh`, `flake.nix`, `flake.lock` и два PDF с нормативами
   (требования/положения ВКР).
   Рабочие файлы сборки и черновики не хранятся. Не добавляйте бланки, картинки
@@ -1255,15 +1255,15 @@ right=23.7mm,…}` на одну страницу), потому что инач
 
 ```bash
 # Сборка (сама поднимает окружение из flake.nix)
-./compile.sh thesis.tex
+./compile.sh thesis/thesis.tex
 
 # То же, если оболочка уже активирована
 nix develop
-./compile.sh thesis.tex
+./compile.sh thesis/thesis.tex
 
 # Полная пересборка с нуля
-nix develop --command latexmk -C thesis.tex
-./compile.sh thesis.tex
+nix develop --command latexmk -C thesis/thesis.tex
+./compile.sh thesis/thesis.tex
 
 # Проверки (внутри nix develop префикс env -u не нужен)
 grep -n "Overfull\|Underfull\|Missing character\|Warning" thesis.log
@@ -1274,11 +1274,11 @@ env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
 
 ---
 
-## 32. Бланк отзыва руководителя ВКР (`report.tex`)
+## 32. Бланк отзыва руководителя ВКР (`report/report.tex`)
 
-Самостоятельный документ (не фрагмент `thesis.tex`), собранный по шаблону
+Самостоятельный документ (не фрагмент `thesis/thesis.tex`), собранный по шаблону
 `2б_Отзыв_ВКР_Руковд(УрФУ)+Соруковд(УрФУ).doc` (инструкция ВКР 2026).
-Сборка: `./compile.sh report.tex`. Результат — ровно одна страница A4.
+Сборка: `./compile.sh report/report.tex`. Результат — ровно одна страница A4.
 
 ### 32.1. Метрики (сняты с PDF-эталона)
 
@@ -1326,7 +1326,7 @@ env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
 ### 32.4. Проверка
 
 ```bash
-./compile.sh report.tex
+./compile.sh report/report.tex
 grep -n "Overfull\|Missing character" report.log
 env -u LD_LIBRARY_PATH pdfinfo report.pdf | grep Pages
 ```
