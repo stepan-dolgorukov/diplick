@@ -10,7 +10,7 @@
 
 ## 0. Кратко: что здесь есть и что делать
 
-В репозитории **четыре файла**:
+В репозитории **семь файлов**:
 
 - `thesis.tex` — **главный** (и единственный) файл шаблона. Собирается
   XeLaTeX + `latexmk`; результат — `thesis.pdf`.
@@ -1229,10 +1229,13 @@ right=23.7mm,…}` на одну страницу), потому что инач
 
 ## 30. Ограничения и известные проблемы
 
-- **В репозитории находятся `thesis.tex`, `AGENTS.md` и два PDF с нормативами**
-  (требования/положения ВКР). Рабочие файлы сборки и черновики не хранятся.
-  Не добавляйте бланки, картинки и PDF в репозиторий без явной необходимости.
-- **`LD_LIBRARY_PATH`.** Без `env -u LD_LIBRARY_PATH` XeLaTeX не запускается.
+- **В репозитории** находятся `thesis.tex`, `AGENTS.md`, `compile.sh`,
+  `flake.nix`, `flake.lock` и два PDF с нормативами (требования/положения ВКР).
+  Рабочие файлы сборки и черновики не хранятся. Не добавляйте бланки, картинки
+  и PDF в репозиторий без явной необходимости.
+- **`LD_LIBRARY_PATH`.** Вне оболочки `nix develop` XeLaTeX падает без
+  `env -u LD_LIBRARY_PATH`; `compile.sh` и `flake.nix` снимают эту проблему
+  сами (§ 2.1, § 2.4).
 - **Содержание обновляется не с первого прохода.** После правки заголовков
   запускайте `latexmk` повторно (обычно он делает это сам).
 - **Шрифты.** Если `Times New Roman` не найден, XeLaTeX подставит другой
@@ -1247,22 +1250,20 @@ right=23.7mm,…}` на одну страницу), потому что инач
 ## 31. Полезные команды
 
 ```bash
-# Сборка
-env -u LD_LIBRARY_PATH latexmk -xelatex -interaction=nonstopmode -halt-on-error thesis.tex
+# Сборка (сама поднимает окружение из flake.nix)
+./compile.sh thesis.tex
+
+# То же, если оболочка уже активирована
+nix develop
+./compile.sh thesis.tex
 
 # Полная пересборка с нуля
-env -u LD_LIBRARY_PATH latexmk -C thesis.tex
-env -u LD_LIBRARY_PATH latexmk -xelatex -interaction=nonstopmode thesis.tex
+nix develop --command latexmk -C thesis.tex
+./compile.sh thesis.tex
 
-# Проверка лога
+# Проверки (внутри nix develop префикс env -u не нужен)
 grep -n "Overfull\|Underfull\|Missing character\|Warning" thesis.log
-
-# Текст по страницам
-env -u LD_LIBRARY_PATH pdftotext -layout -f 1 -l 5 thesis.pdf -
-
-# Картинки страниц
-env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
-
-# Метаданные
 env -u LD_LIBRARY_PATH pdfinfo thesis.pdf
+env -u LD_LIBRARY_PATH pdftotext -layout -f 1 -l 5 thesis.pdf -
+env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
 ```
