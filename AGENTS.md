@@ -15,6 +15,10 @@
 - `thesis.tex` — **главный** (и единственный) файл шаблона. Собирается
   XeLaTeX + `latexmk`; результат — `thesis.pdf`.
 - `AGENTS.md` — этот файл: требования, карта шаблона, рецепты и запреты.
+- `compile.sh` — сборка PDF: `./compile.sh thesis.tex` (вне `nix develop` сам
+  перезапускается через него).
+- `flake.nix`, `flake.lock` — окружение сборки: TeX Live (XeLaTeX, `latexmk`,
+  нужные пакеты), Times New Roman (`corefonts`), Liberation Mono, `poppler-utils`.
 - `vkr_requirements_ienim_2024.pdf` — Положение ИЕНиМ УрФУ о ВКР (2024).
 - `vkr_requirements_urfu_2022.pdf` — общеуниверситетский стандарт УрФУ (2022).
 
@@ -63,8 +67,20 @@
 
 ### 2.1. Команда сборки
 
-В этом окружении `LD_LIBRARY_PATH` указывает на Nix-библиотеки, из-за чего
-системный `xelatex` падает с `GLIBC_2.38 not found`. Поэтому **всегда**:
+Основной способ — скрипт, который сам поднимает окружение из `flake.nix`:
+
+```bash
+cd /home/sdd/programming/diplick
+./compile.sh thesis.tex
+```
+
+Внутри `nix develop` он работает напрямую, снаружи — один раз перезапускается
+через `nix develop`, поэтому активировать оболочку вручную не обязательно.
+PDF и рабочие файлы появляются рядом с `.tex`-файлом.
+
+Если собирать `latexmk` вручную (в этом окружении `LD_LIBRARY_PATH` указывает
+на Nix-библиотеки, из-за чего системный `xelatex` падает с
+`GLIBC_2.38 not found`):
 
 ```bash
 cd /home/sdd/programming/diplick
@@ -102,9 +118,41 @@ env -u LD_LIBRARY_PATH pdftoppm -r 80 -png thesis.pdf /tmp/opencode/page
 рабочие файлы, их не редактируют руками и не считают результатом. Результат —
 `*.pdf`.
 
-**В репозитории один коммит** — `thesis.tex` и `AGENTS.md`. Сборка создаёт
-`thesis.pdf` и рабочие файлы, но они в репозиторий не входят. Перед рискованной
-правкой делайте копию файла в `/tmp/opencode/`.
+Сборка создаёт `thesis.pdf` и рабочие файлы, но они в репозиторий не входят.
+Перед рискованной правкой делайте копию файла в `/tmp/opencode/`.
+
+### 2.4. Окружение Nix
+
+`flake.nix` описывает `devShells.default` — единственное место, где перечислены
+зависимости сборки:
+
+| Что | Зачем |
+|---|---|
+| `texliveSmall.withPackages` | XeLaTeX, `latexmk` и пакеты шаблона: `fontspec`, `polyglossia`, `unicode-math`, `extsizes`, `caption`, `titlesec`, `booktabs`, `setspace`, `tex-gyre-math`, `collection-langcyrillic`, `collection-fontsrecommended` |
+| `corefonts` | Times New Roman (метрики титула и бланка задания сверены именно с ним) |
+| `liberation_ttf` | Liberation Mono для `\cyrillicfonttt` |
+| `poppler-utils`, `qpdf` | проверки из § 2.2 и работа с PDF |
+| `FONTCONFIG_FILE` (`makeFontsConf`) | fontspec ищет шрифты через fontconfig; без этого файла Times New Roman не находится |
+| `shellHook` | снимает `LD_LIBRARY_PATH` (см. § 2.1) и выставляет `VKR_ENV=1` — по этой метке `compile.sh` понимает, что уже внутри оболочки |
+
+`corefonts` помечен как unfree, поэтому в `flake.nix` стоит
+`allowUnfreePredicate` ровно на этот пакет — не включайте `allowUnfree`
+целиком. Версия nixpkgs зафиксирована в `flake.lock`; обновление —
+`nix flake update`.
+
+Проверка окружения:
+
+```bash
+nix develop --command bash -c 'xelatex --version; fc-match "Times New Roman"'
+```
+
+Ожидаемый вывод — TeX Live нужного года и `Times_New_Roman.ttf`. Если `xelatex`
+падает с `GLIBC_2.38 not found`, значит сборка идёт вне оболочки с чужим
+`LD_LIBRARY_PATH`: используйте `./compile.sh` или `env -u LD_LIBRARY_PATH`.
+
+Артефакты другой версии TeX Live несовместимы: после смены окружения удалите
+`*.aux`, `*.toc`, `*.out`, `*.xdv`, иначе polyglossia может упасть на старом
+`thesis.aux`.
 
 ---
 
