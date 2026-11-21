@@ -13,9 +13,9 @@
 В репозитории **восемь файлов**:
 
 - `thesis/thesis.tex` — **главный** файл шаблона ВКР. Собирается XeLaTeX +
-  `latexmk`; результат — `thesis.pdf`.
+  `latexmk`; результат — `thesis/thesis.pdf`.
 - `report/report.tex` — самостоятельный бланк отзыва руководителя ВКР по форме
-  инструкции ВКР 2026; результат — `report.pdf` (см. § 32).
+  инструкции ВКР 2026; результат — `report/report.pdf` (см. § 32).
 - `AGENTS.md` — этот файл: требования, карта шаблона, рецепты и запреты.
 - `compile.sh` — сборка PDF: `./compile.sh thesis/thesis.tex` (вне `nix develop` сам
   перезапускается через него).
@@ -100,16 +100,16 @@ env -u LD_LIBRARY_PATH latexmk -xelatex -interaction=nonstopmode -halt-on-error 
 echo $?
 
 # 2. Не должно быть переполнений и потерянных символов
-grep -n "Overfull\|Missing character" thesis.log
+grep -n "Overfull\|Missing character" thesis/thesis.log
 
 # 3. Число страниц и формат
-env -u LD_LIBRARY_PATH pdfinfo thesis.pdf | grep -E "Pages|Page size"
+env -u LD_LIBRARY_PATH pdfinfo thesis/thesis.pdf | grep -E "Pages|Page size"
 
 # 4. Текст и колонтитулы
-env -u LD_LIBRARY_PATH pdftotext -layout thesis.pdf - | less
+env -u LD_LIBRARY_PATH pdftotext -layout thesis/thesis.pdf - | less
 
 # 5. Визуальный контроль
-env -u LD_LIBRARY_PATH pdftoppm -r 80 -png thesis.pdf /tmp/opencode/page
+env -u LD_LIBRARY_PATH pdftoppm -r 80 -png thesis/thesis.pdf /tmp/opencode/page
 ```
 
 `Underfull \hbox` в коротком абзаце допустим (косметика), `Overfull \hbox` —
@@ -121,7 +121,7 @@ env -u LD_LIBRARY_PATH pdftoppm -r 80 -png thesis.pdf /tmp/opencode/page
 рабочие файлы, их не редактируют руками и не считают результатом. Результат —
 `*.pdf`.
 
-Сборка создаёт `thesis.pdf` и рабочие файлы, но они в репозиторий не входят.
+Сборка создаёт `thesis/thesis.pdf` и рабочие файлы, но они в репозиторий не входят.
 Перед рискованной правкой делайте копию файла в `/tmp/opencode/`.
 
 ### 2.4. Окружение Nix
@@ -1266,10 +1266,10 @@ nix develop --command latexmk -C thesis/thesis.tex
 ./compile.sh thesis/thesis.tex
 
 # Проверки (внутри nix develop префикс env -u не нужен)
-grep -n "Overfull\|Underfull\|Missing character\|Warning" thesis.log
-env -u LD_LIBRARY_PATH pdfinfo thesis.pdf
-env -u LD_LIBRARY_PATH pdftotext -layout -f 1 -l 5 thesis.pdf -
-env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
+grep -n "Overfull\|Underfull\|Missing character\|Warning" thesis/thesis.log
+env -u LD_LIBRARY_PATH pdfinfo thesis/thesis.pdf
+env -u LD_LIBRARY_PATH pdftotext -layout -f 1 -l 5 thesis/thesis.pdf -
+env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis/thesis.pdf /tmp/opencode/pg
 ```
 
 ---
@@ -1310,7 +1310,7 @@ env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
   и распорка `\vkrstrut` (11,2 / 2,85 pt) дают высоты строк 55,7 / 28,1 pt
   как в эталоне. Строка `\\[-1.505pt]` перед `\hline` снимает
   пустое место под «хвостом» буквы «ц».
-- **Раггед-правый** абзац «Оценка соответствия ...» обёрнут в
+- **Ragged Right** абзац «Оценка соответствия ...» обёрнут в
   `\begingroup\raggedright ... \endgroup`, чтобы `raggedright` не утекал в
   следующие абзацы (и не отключал выравнивание по ширине в «Заключении»).
 - **Запрет переноса** в фразе «достойным/недостойным» и
@@ -1327,8 +1327,8 @@ env -u LD_LIBRARY_PATH pdftoppm -r 100 -png thesis.pdf /tmp/opencode/pg
 
 ```bash
 ./compile.sh report/report.tex
-grep -n "Overfull\|Missing character" report.log
-env -u LD_LIBRARY_PATH pdfinfo report.pdf | grep Pages
+grep -n "Overfull\|Missing character" report/report.log
+env -u LD_LIBRARY_PATH pdfinfo report/report.pdf | grep Pages
 ```
 
 `Underfull \hbox` в ячейках таблицы (badness 10000) допустим — это
