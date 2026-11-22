@@ -15,6 +15,7 @@
 \usepackage{polyglossia}
 \setdefaultlanguage{russian}
 \newfontfamily\cyrillicfont{Times New Roman}[Script=Cyrillic]
+\usepackage[normalem]{ulem}
 
 % Поля бланка отзыва: 25,4 / 11,05 / 19 / 9,5 мм (sectPr эталона).
 \usepackage[left=25.4mm,right=11.05mm,top=19mm,bottom=9.5mm]{geometry}
@@ -55,6 +56,109 @@
 % Строка таблицы в бланке — ровно 28,1 bp: подрезаем пустое место под текстом.
 \newcommand{\vkrrowfix}{-1.505pt}
 
+% Пустой макрос оставляет ветку бланка. Сравнение — по уже раскрытому
+% значению: \newcommand делает макрос \long, поэтому \ifx с \@empty не годится.
+\makeatletter
+\newcommand{\vkrifempty}[1]{%
+  \expandafter\vkr@ifempty\expandafter{#1}}
+\newcommand{\vkr@ifempty}[1]{%
+  \if\relax\detokenize{#1}\relax
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi}
+\newbox\vkrbox
+\newcount\vkrleft
+\makeatother
+% Поле фиксированной ширины (в bp). Пустой текст — линия бланка; текст
+% короче поля остаётся на той же линии, более длинный подчёркивается по
+% своей ширине.
+\newcommand{\vkrfield}[2]{%
+  \expandafter\vkrfieldbody\expandafter{#2}{#1}}
+\newcommand{\vkrfieldbody}[2]{%
+  \if\relax\detokenize{#1}\relax
+    \vkrblank{#2}%
+  \else
+    \begingroup
+    \renewcommand{\ULthickness}{0.5pt}%
+    \setlength{\ULdepth}{1.5pt}%
+    \setbox0=\hbox{#1}%
+    \ifdim\wd0>\vkrbp{#2}\relax
+      \mbox{\uline{#1}}%
+    \else
+      \makebox[\vkrbp{#2}][l]{\rlap{\vkrblank{#2}}#1}%
+    \fi
+    \endgroup
+  \fi}
+% Многострочное поле бланка. #1 — шаг базовых линий (bp), #2 — число строк
+% вместе со строкой метки, #3 — метка, #4 — текст. Высота блока при тексте
+% не длиннее #2 строк совпадает с пустыми линиями, поэтому нижняя часть
+% бланка не смещается.
+\newcommand{\vkrtextbox}[4]{%
+  \begingroup
+  \renewcommand{\ULthickness}{0.5pt}%
+  \setlength{\ULdepth}{1.5pt}%
+  \global\setbox\vkrbox=\vbox{%
+    \hsize=\linewidth
+    \parindent=0pt
+    \parskip=0pt
+    \baselineskip=\vkrbp{#1}\relax
+    \lineskiplimit=-100pt
+    \raggedright
+    % \uline переносит строку по пробелам только в уже раскрытом тексте.
+    \noindent\strut #3\expandafter\uline\expandafter{#4}\par
+    \vkrleft=#2\relax
+    \advance\vkrleft by -\prevgraf
+    \ifnum\prevgraf>#2\relax
+      \PackageWarning{vkrreport}{Текст поля занял \the\prevgraf\ строк вместо #2}%
+    \fi
+    \loop
+    \ifnum\vkrleft>0
+      \noindent\strut\vkrblank{486}\par
+      \advance\vkrleft by -1
+    \repeat
+  }%
+  \endgroup
+  \box\vkrbox}
+% Направление на строке бланка: пустые код и название ничего не добавляют.
+\newcommand{\vkrdirectioninline}{%
+  \vkrifempty{\VKRDirectionCode}{%
+    \vkrifempty{\VKRDirection}{}{ «\VKRDirection»}%
+  }{ \VKRDirectionCode\vkrifempty{\VKRDirection}{}{ «\VKRDirection»}}%
+}
+% В заключении пустая пара код+название оставляет подсказку бланка.
+\newcommand{\vkrdirectionconclusion}{%
+  \vkrifempty{\VKRDirectionCode}{%
+    \vkrifempty{\VKRDirection}{%
+      \textbf{код \mbox{направления «название направления»}}%
+    }{%
+      \textbf{\mbox{«\VKRDirection»}}%
+    }%
+  }{%
+    \textbf{\mbox{\VKRDirectionCode\vkrifempty{\VKRDirection}{}{ «\VKRDirection»}}}%
+  }%
+}
+
+% —————————————————————————
+% Данные отзыва. Пустое значение оставляет линию или подсказку бланка.
+% \VKRDirection — наименование без кавычек: бланк сам ставит «».
+% \VKRAdvisor и \VKRSorukovoditel — «Ф. И. О., учёная степень, учёное звание
+% (должность)». Тема, достоинства, недостатки и информация для ГЭК
+% переносятся по строкам бланка (2, 4, 3 и 3 строки).
+% —————————————————————————
+\newcommand{\VKRTitle}{}
+\newcommand{\VKRStudent}{}
+\newcommand{\VKRGruppa}{}
+\newcommand{\VKRDirectionCode}{}
+\newcommand{\VKRDirection}{}
+\newcommand{\VKRProgram}{}
+\newcommand{\VKRAdvisor}{}
+\newcommand{\VKRSorukovoditel}{}
+\newcommand{\VKRMerits}{}
+\newcommand{\VKRShortcomings}{}
+\newcommand{\VKRGEKInfo}{}
+\newcommand{\VKRQualification}{}
+
 \begin{document}
 
 \vkrp{\vkrcenter{Министерство науки и высшего образования Российской Федерации}}
@@ -68,19 +172,23 @@
 \vkrgap{20.7}
 \vkrp{\vkrcenter{руководителя выпускной квалификационной работы}}
 \vkrgap{20.7}
+\vkrifempty{\VKRTitle}{%
 \vkrp{\vkrline{Выпускная квалификационная работа выполнена на тему\hspace{3.1pt}\vkrblank{186}}}
 \vkrgap{20.7}
 \vkrp{\vkrline{\vkrblank{486}}}
+}{%
+\vkrtextbox{20.7}{2}{Выпускная квалификационная работа выполнена на тему\hspace{3.1pt}}{\VKRTitle}%
+}
 \vkrgap{20.7}
-\vkrp{\vkrline{Студентом\hspace{3.1pt}\vkrblank{264}\hspace{3pt}группы\hspace{3.1pt}\vkrblank{120}}}
+\vkrp{\vkrline{Студентом\hspace{3.1pt}\vkrfield{264}{\VKRStudent}\hspace{3pt}группы\hspace{3.1pt}\vkrfield{120}{\VKRGruppa}}}
 \vkrgap{20.7}
-\vkrp{Направление (специальность):}
+\vkrp{Направление (специальность):\vkrdirectioninline}
 \vkrgap{13.8}
-\vkrp{Образовательная программа:}
+\vkrp{Образовательная программа:\vkrifempty{\VKRProgram}{}{ \VKRProgram}}
 \vkrgap{13.8}
-\vkrp{Руководитель: Ф.И.О., ученая степень, ученое звание (должность)}
+\vkrp{Руководитель: \vkrifempty{\VKRAdvisor}{Ф.И.О., ученая степень, ученое звание (должность)}{\VKRAdvisor}}
 \vkrgap{13.8}
-\vkrp{Соруководитель: Ф.И.О., ученая степень, ученое звание (должность)}
+\vkrp{Соруководитель: \vkrifempty{\VKRSorukovoditel}{Ф.И.О., ученая степень, ученое звание (должность)}{\VKRSorukovoditel}}
 
 \vkrgap{19.5}
 % В бланке у этого абзаца выравнивание по левому краю (jc не задан).
@@ -115,6 +223,7 @@
 \noindent\usebox{\vkrtable}\par
 
 \vkrgapabs{20.42}
+\vkrifempty{\VKRMerits}{%
 \vkrp{\vkrline{\textbf{Отмеченные достоинства:}\hspace{3pt}\vkrblank{336}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
@@ -122,26 +231,37 @@
 \vkrp{\vkrline{\vkrblank{486}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
+}{%
+\vkrtextbox{13.8}{4}{\textbf{Отмеченные достоинства:}\hspace{3pt}}{\VKRMerits}%
+}
 \vkrgap{13.8}
+\vkrifempty{\VKRShortcomings}{%
 \vkrp{\vkrline{\textbf{Отмеченные недостатки:}\hspace{3pt}\vkrblank{342}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
+}{%
+\vkrtextbox{13.8}{3}{\textbf{Отмеченные недостатки:}\hspace{3pt}}{\VKRShortcomings}%
+}
 
 \vkrgap{27.6}
+\vkrifempty{\VKRGEKInfo}{%
 \vkrp{\vkrline{Дополнительная информация для ГЭК:\hspace{3pt}\vkrblank{282}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
 \vkrgap{13.8}
 \vkrp{\vkrline{\vkrblank{486}}}
+}{%
+\vkrtextbox{13.8}{3}{Дополнительная информация для ГЭК:\hspace{3pt}}{\VKRGEKInfo}%
+}
 
 \vkrgap{27.6}
 \vkrp{\textbf{Заключение.} Выполненная работа является самостоятельным, законченным
 исследованием,
 \mbox{достойным/недостойным} представления перед ГЭК. Студент (Ф.И.О.)
-\vkrblank{108} заслуживает/не заслуживает присуждения квалификации
-\textbf{бакалавр} по направлению \textbf{код \mbox{направления «название направления»}}.}
+\vkrfield{108}{\VKRStudent} заслуживает/не заслуживает присуждения квалификации
+\vkrifempty{\VKRQualification}{\textbf{бакалавр}}{\textbf{\mbox{\VKRQualification}}} по направлению \vkrdirectionconclusion.}
 
 \vkrgap{41.4}
 \vkrp{\vkrline{Руководитель:\hspace{3pt}\vkrblank{165}\hspace{27.1pt}«\hspace{3pt}\vkrblank{24}\hspace{3pt}»\hspace{6pt}\vkrblank{78}\hspace{6pt}20\vkrblank{24}\hspace{3pt}г.}}
