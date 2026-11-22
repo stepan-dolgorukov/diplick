@@ -131,7 +131,7 @@ env -u LD_LIBRARY_PATH pdftoppm -r 80 -png thesis/thesis.pdf /tmp/opencode/page
 
 | Что | Зачем |
 |---|---|
-| `texliveSmall.withPackages` | XeLaTeX, `latexmk` и пакеты шаблона: `fontspec`, `polyglossia`, `unicode-math`, `extsizes`, `caption`, `titlesec`, `booktabs`, `setspace`, `tex-gyre-math`, `collection-langcyrillic`, `collection-fontsrecommended` |
+| `texliveSmall.withPackages` | XeLaTeX, `latexmk` и пакеты шаблона: `fontspec`, `polyglossia`, `unicode-math`, `extsizes`, `caption`, `titlesec`, `ulem`, `booktabs`, `setspace`, `tex-gyre-math`, `collection-langcyrillic`, `collection-fontsrecommended` |
 | `corefonts` | Times New Roman (метрики титула и бланка задания сверены именно с ним) |
 | `liberation_ttf` | Liberation Mono для `\cyrillicfonttt` |
 | `poppler-utils`, `qpdf` | проверки из § 2.2 и работа с PDF |
@@ -936,7 +936,8 @@ Roman (через `unicode-math` + `TeX Gyre Termes Math`), гарнитура �
 поэтому отступы заданы дробными `\vspace*{…}`. При любой правке содержимого
 бланка пересоберите документ и сверьте базовые линии по content-потоку PDF
 (`Td`/`cm`), а не по bbox: у LibreOffice и XeTeX разные метрики bbox.
-Тема занимает две строки, под второй идёт линия поля `\rule{469.3pt}`.
+Тема берётся из `\VKRTitle`. Команда `\uline` из пакета `ulem` подчёркивает
+текст темы с автоматическим переносом по строкам.
 
 ---
 

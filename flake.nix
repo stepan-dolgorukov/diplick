@@ -29,6 +29,7 @@
             extsizes
             caption
             titlesec
+            ulem
             booktabs
             setspace
             tex-gyre-math
