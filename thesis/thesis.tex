@@ -144,8 +144,9 @@
 \newcommand{\VKRStudentGenitiveTitle}{Смирнова Юрия\\Викторовича}
 \newcommand{\VKRGruppa}{\underline{\hspace{2.5cm}}}
 \newcommand{\VKRDirection}{04.03.01 «Химия»}
-% Образовательная программа указывается при наличии нескольких программ
-% направления подготовки (ИЕНиМ, с. 24, сноска 11).
+% Образовательная программа обязательна для магистра (ИЕНиМ, с. 24–26),
+% также указывается при наличии нескольких программ направления подготовки.
+% Оставьте значение пустым {}, если строка программы не требуется.
 \newcommand{\VKRProgram}{«Химия»}
 \newcommand{\VKRInstitute}{Институт естественных наук и математики}
 \newcommand{\VKRInstituteLoc}{Институте естественных наук и математики}
@@ -215,13 +216,15 @@
 \vspace{1.99\baselineskip}
 
 {\centering
-\textbf{ХРОМАТОГРАФИЧЕСКОЕ ИССЛЕДОВАНИЕ}\\
-\textbf{СИСТЕМЫ ПОЛИЭТИЛЕНОКСИД–ХИТОЗАН}\par}
+\textbf{\VKRTitle}\par}
 
 \vspace{1\baselineskip}
 
 {\centering
-Направление подготовки \VKRDirection\par}
+Направление подготовки \VKRDirection\par
+\ifx\VKRProgram\empty\else
+Образовательная программа \VKRProgram\par
+\fi}
 
 \vspace{2.02\baselineskip}
 
